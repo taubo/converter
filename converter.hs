@@ -1,7 +1,7 @@
 import System.Environment
 import Data.Char
-import Data.Digits -- FIXME: additional package, use cabal/stack
 import Numeric
+import Data.Digits -- FIXME: additional package, use cabal/stack
 
 -- FIXME: error management missing
 
@@ -32,8 +32,10 @@ supportedFormatTypes = [Hex, Bin, Dec]
 complementList :: (Eq a) => a -> [a] -> [a]
 complementList elem ls = filter (elem /=) ls
 
+toBase :: (ReadS Int) -> Int -> String -> String
 toBase readFunc base num = showIntAtBase base intToDigit (fst . head . readFunc $ num) ""
 
+hexToBase :: Int -> String -> String
 hexToBase base hex = toBase readHex base hex
 
 -- example of a conversion from hex to bin
