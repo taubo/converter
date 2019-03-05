@@ -1,6 +1,9 @@
 import System.Environment
 import Data.Char
--- import qualified Data.Set as S
+import Data.Digits -- FIXME: additional package, use cabal/stack
+import Numeric
+
+-- FIXME: error management missing
 
 data FormatType = Hex | Bin | Str | Dec | Unrecognized deriving(Show)
 
@@ -24,15 +27,28 @@ getNumFormat(x:xs)
   | otherwise           = NumFormat { format = Unrecognized, content = x:xs}
 
 supportedFormatTypes :: [FormatType]
-supportedFormatTypes = [Hex, Bin, Str, Dec]
+supportedFormatTypes = [Hex, Bin, Dec]
 
 complementList :: (Eq a) => a -> [a] -> [a]
 complementList elem ls = filter (elem /=) ls
+
+toBase readFunc base num = showIntAtBase base intToDigit (fst . head . readFunc $ num) ""
+
+hexToBase base hex = toBase readHex base hex
+
+-- example of a conversion from hex to bin
+hexToBin hex = hexToBase 2 hex
+hexToDec hex = hexToBase 10 hex
 
 main :: IO ()
 main = do
     args <- getArgs
     let formats = map getNumFormat args
     let toPrintFormatsTypes = complementList (format $ head $ formats) supportedFormatTypes
-    print toPrintFormatsTypes
-    print formats
+    -- print toPrintFormatsTypes
+    -- print formats
+    putStr "(Bin)\t\t(Dec)\n"
+    putStr (hexToBin (content $ head $ formats))
+    putStr "\t"
+    putStr (hexToDec (content $ head $ formats))
+    putStr "\n"
