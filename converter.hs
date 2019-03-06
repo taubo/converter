@@ -16,12 +16,10 @@ instance Eq FormatType where
 
 data NumFormat = NumFormat { format :: FormatType
                            , content :: String
-                           } deriving (Show)
+                           }
 
-    {--
 instance Show NumFormat where
-    show (NumFormat fmtType xs) = "(" ++ show fmtType ++ ")" ++ "\n" ++ show xs
---}
+    show (NumFormat fmtType xs) = "\n(" ++ show fmtType ++ ")" ++ ": " ++ show xs ++ "\n"
 
 getNumFormat :: String -> NumFormat
 getNumFormat(x:xs)
