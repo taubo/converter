@@ -12,11 +12,16 @@ instance Eq FormatType where
     Bin == Bin = True
     Str == Str = True
     Dec == Dec = True
-    _== _  = False
+    _ == _ = False
 
 data NumFormat = NumFormat { format :: FormatType
                            , content :: String
                            } deriving (Show)
+
+    {--
+instance Show NumFormat where
+    show (NumFormat fmtType xs) = "(" ++ show fmtType ++ ")" ++ "\n" ++ show xs
+--}
 
 getNumFormat :: String -> NumFormat
 getNumFormat(x:xs)
@@ -50,24 +55,33 @@ hexTo Dec = hexToDec
 hexTo Bin = hexToBin
 
 fmtFromHexTo :: FormatType -> NumFormat -> NumFormat
-fmtFromHexTo numFmt fmtHex = NumFormat { format = numFmt, content = (hexTo numFmt) $ content $ fmtHex } -- put hexTo instead of hexToDec
+fmtFromHexTo numFmt fmtHex = NumFormat { format = numFmt, content = (hexTo numFmt) $ content $ fmtHex }
 
 fmtFromHexToDec :: NumFormat -> NumFormat
-fmtFromHexToDec fmtHex = NumFormat { format = Dec, content = (hexTo Dec) $ content $ fmtHex }
+fmtFromHexToDec fmtHex = fmtFromHexTo Dec fmtHex
 
 fmtFromHexToBin :: NumFormat -> NumFormat
-fmtFromHexToBin fmtHex = NumFormat { format = Bin, content = (hexTo Bin) $ content $ fmtHex }
+fmtFromHexToBin fmtHex = fmtFromHexTo Bin fmtHex
+
+-- simple case, limited to the case of conversion from hex
+composePrintFmts :: [FormatType] -> NumFormat -> [NumFormat]
+composePrintFmts (x:xs) fmt = fmtFromHexTo x fmt : composePrintFmts xs fmt
+composePrintFmts [] fmt = []
 
 main :: IO ()
 main = do
     args <- getArgs
     let formats = map getNumFormat args
-    let toPrintFormatsTypes = complementList (format $ head $ formats) supportedFormatTypes
+    let srcFmt = format $ head $ formats
+    let srcContent = content $ head $ formats
+    let toPrintFormatsTypes = complementList srcFmt supportedFormatTypes
+    putStrLn $ (show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
     -- print toPrintFormatsTypes
     -- print formats
-    let fmtFunctions = map hexTo toPrintFormatsTypes
+        {--
     putStr "(Bin)\t\t(Dec)\n"
     putStr (hexToBin (content $ head $ formats))
     putStr "\t"
     putStr (hexToDec (content $ head $ formats))
     putStr "\n"
+        --}
