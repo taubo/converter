@@ -45,14 +45,18 @@ hexToBin hex = hexToBase 2 hex
 hexToDec :: String -> String
 hexToDec hex = hexToBase 10 hex
 
-fmtFromHexTo :: NumFormat -> FormatType -> NumFormat
-fmtFromHexTo numFmt fmtHex = NumFormat { format = numFmt, content = hexToDec $ content $ fmtHex }
+hexTo :: FormatType -> (String -> String)
+hexTo Dec = hexToDec
+hexTo Bin = hexToBin
+
+fmtFromHexTo :: FormatType -> NumFormat -> NumFormat
+fmtFromHexTo numFmt fmtHex = NumFormat { format = numFmt, content = (hexTo numFmt) $ content $ fmtHex } -- put hexTo instead of hexToDec
 
 fmtFromHexToDec :: NumFormat -> NumFormat
-fmtFromHexToDec fmtHex = NumFormat { format = Dec, content = hexToDec $ content $ fmtHex }
+fmtFromHexToDec fmtHex = NumFormat { format = Dec, content = (hexTo Dec) $ content $ fmtHex }
 
 fmtFromHexToBin :: NumFormat -> NumFormat
-fmtFromHexToBin fmtHex = NumFormat { format = Bin, content = hexToBin $ content $ fmtHex }
+fmtFromHexToBin fmtHex = NumFormat { format = Bin, content = (hexTo Bin) $ content $ fmtHex }
 
 main :: IO ()
 main = do
@@ -61,6 +65,7 @@ main = do
     let toPrintFormatsTypes = complementList (format $ head $ formats) supportedFormatTypes
     -- print toPrintFormatsTypes
     -- print formats
+    let fmtFunctions = map hexTo toPrintFormatsTypes
     putStr "(Bin)\t\t(Dec)\n"
     putStr (hexToBin (content $ head $ formats))
     putStr "\t"
