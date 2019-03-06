@@ -39,8 +39,20 @@ hexToBase :: Int -> String -> String
 hexToBase base hex = toBase readHex base hex
 
 -- example of a conversion from hex to bin
+hexToBin :: String -> String
 hexToBin hex = hexToBase 2 hex
+
+hexToDec :: String -> String
 hexToDec hex = hexToBase 10 hex
+
+fmtFromHexTo :: NumFormat -> FormatType -> NumFormat
+fmtFromHexTo numFmt fmtHex = NumFormat { format = numFmt, content = hexToDec $ content $ fmtHex }
+
+fmtFromHexToDec :: NumFormat -> NumFormat
+fmtFromHexToDec fmtHex = NumFormat { format = Dec, content = hexToDec $ content $ fmtHex }
+
+fmtFromHexToBin :: NumFormat -> NumFormat
+fmtFromHexToBin fmtHex = NumFormat { format = Bin, content = hexToBin $ content $ fmtHex }
 
 main :: IO ()
 main = do
