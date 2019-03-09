@@ -38,6 +38,9 @@ complementList elem ls = filter (elem /=) ls
 toBase :: (ReadS Int) -> Int -> String -> String
 toBase readFunc base num = showIntAtBase base intToDigit (fst . head . readFunc $ num) ""
 
+decToBase :: Int -> String -> String
+decToBase base dec = toBase readDec base dec
+
 hexToBase :: Int -> String -> String
 hexToBase base hex = toBase readHex base hex
 
@@ -49,11 +52,32 @@ hexToDec :: String -> String
 hexToDec hex = hexToBase 10 hex
 
 hexTo :: FormatType -> (String -> String)
-hexTo Dec = hexToDec
 hexTo Bin = hexToBin
+hexTo Dec = hexToDec
+
+decToBin :: String -> String
+decToBin dec = decToBase 2 dec
+
+decToHex :: String -> String
+decToHex dec = decToBase 16 dec
+
+decTo :: FormatType -> (String -> String)
+decTo Bin = decToBin
+decTo Hex = decToHex
+
+fromTo :: FormatType -> FormatType -> (String -> String)
+fromTo Dec = decTo
+fromTo Hex = hexTo
+
+fmtFromTo :: FormatType -> FormatType -> NumFormat -> NumFormat
+fmtFromTo fromType toType fromNumFmt =
+    NumFormat { format = toType, content = (fromTo fromType toType) $ content $ fromNumFmt }
+
+fmtFromDecTo :: FormatType -> NumFormat -> NumFormat
+fmtFromDecTo numFmt fmtDec = fmtFromTo Dec numFmt fmtDec
 
 fmtFromHexTo :: FormatType -> NumFormat -> NumFormat
-fmtFromHexTo numFmt fmtHex = NumFormat { format = numFmt, content = (hexTo numFmt) $ content $ fmtHex }
+fmtFromHexTo numFmt fmtHex = fmtFromTo Hex numFmt fmtHex
 
 fmtFromHexToDec :: NumFormat -> NumFormat
 fmtFromHexToDec fmtHex = fmtFromHexTo Dec fmtHex
@@ -63,7 +87,7 @@ fmtFromHexToBin fmtHex = fmtFromHexTo Bin fmtHex
 
 -- simple case, limited to the case of conversion from hex
 composePrintFmts :: [FormatType] -> NumFormat -> [NumFormat]
-composePrintFmts (x:xs) fmt = fmtFromHexTo x fmt : composePrintFmts xs fmt
+composePrintFmts (x:xs) fmt = fmtFromTo (format fmt) x fmt : composePrintFmts xs fmt
 composePrintFmts [] fmt = []
 
 main :: IO ()
@@ -74,12 +98,3 @@ main = do
     let srcContent = content $ head $ formats
     let toPrintFormatsTypes = complementList srcFmt supportedFormatTypes
     putStrLn $ (show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
-    -- print toPrintFormatsTypes
-    -- print formats
-        {--
-    putStr "(Bin)\t\t(Dec)\n"
-    putStr (hexToBin (content $ head $ formats))
-    putStr "\t"
-    putStr (hexToDec (content $ head $ formats))
-    putStr "\n"
-        --}
