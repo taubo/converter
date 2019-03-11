@@ -3,7 +3,9 @@ module Main where
 import System.Environment
 import Data.Char
 import Numeric
-import Data.Digits -- FIXME: additional package, use cabal/stack
+import Data.Digits
+import System.Console.ANSI
+import Text.Layout.Table
 
 -- FIXME: error management missing
 
@@ -100,4 +102,15 @@ main = do
     let srcContent = content $ head $ formats
     let toPrintFormatsTypes = complementList srcFmt supportedFormatTypes
     -- putStrLn $ (show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
+    setSGR [SetColor Foreground Vivid Red]
+    setSGR [SetColor Background Vivid White]
+    setSGR [SetConsoleIntensity BoldIntensity]
     mapM_ putStrLn (map show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
+    setSGR [Reset]
+
+    putStrLn $ tableString [def , numCol]
+                       unicodeRoundS
+                       def
+                       [ rowG (map show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
+                       , rowG ["Jane", "162.2"]
+                       ]
