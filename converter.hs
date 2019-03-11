@@ -19,7 +19,7 @@ data NumFormat = NumFormat { format :: FormatType
                            }
 
 instance Show NumFormat where
-    show (NumFormat fmtType xs) = "\n(" ++ show fmtType ++ ")" ++ ": " ++ show xs ++ "\n"
+    show (NumFormat fmtType xs) = "(" ++ show fmtType ++ ")" ++ ": " ++ show xs
 
 getNumFormat :: String -> NumFormat
 getNumFormat(x:xs)
@@ -97,4 +97,5 @@ main = do
     let srcFmt = format $ head $ formats
     let srcContent = content $ head $ formats
     let toPrintFormatsTypes = complementList srcFmt supportedFormatTypes
-    putStrLn $ (show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
+    -- putStrLn $ (show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
+    mapM_ putStrLn (map show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
