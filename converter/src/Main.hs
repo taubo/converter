@@ -7,6 +7,8 @@ import Data.Digits
 import System.Console.ANSI
 import Text.Layout.Table
 
+import Data.Colour.SRGB (sRGB24)
+
 -- FIXME: error management missing
 
 data FormatType = Hex | Bin | Str | Dec | Unrecognized deriving(Show)
@@ -103,8 +105,11 @@ main = do
     -- putStrLn $ (show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
     setSGR [SetColor Foreground Vivid White]
     setSGR [SetColor Background Vivid Blue]
+    -- setSGR [SetRGBColor Foreground $ sRGB24 0 0 0]
+
     putStr (show $ NumFormat srcFmt srcContent)
-    setSGR [SetColor Foreground Vivid White]
+    setSGR [SetRGBColor Foreground $ sRGB24 0 0 0]
+    -- setSGR [SetColor Foreground Vivid Yellow]
     setSGR [SetColor Background Vivid Black]
     setSGR [SetConsoleIntensity BoldIntensity]
     mapM_ putStr (map show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
