@@ -23,7 +23,7 @@ data NumFormat = NumFormat { format :: FormatType
                            }
 
 instance Show NumFormat where
-    show (NumFormat fmtType xs) = "(" ++ show fmtType ++ ")" ++ ": " ++ show xs
+    show (NumFormat fmtType xs) = " (" ++ show fmtType ++ ")" ++ ": " ++ show xs ++ " "
 
 getNumFormat :: String -> NumFormat
 getNumFormat(x:xs)
@@ -77,19 +77,18 @@ fmtFromTo :: FormatType -> FormatType -> NumFormat -> NumFormat
 fmtFromTo fromType toType fromNumFmt =
     NumFormat { format = toType, content = (fromTo fromType toType) $ content $ fromNumFmt }
 
-fmtFromDecTo :: FormatType -> NumFormat -> NumFormat
-fmtFromDecTo numFmt fmtDec = fmtFromTo Dec numFmt fmtDec
+-- fmtFromDecTo :: FormatType -> NumFormat -> NumFormat
+-- fmtFromDecTo numFmt fmtDec = fmtFromTo Dec numFmt fmtDec
 
-fmtFromHexTo :: FormatType -> NumFormat -> NumFormat
-fmtFromHexTo numFmt fmtHex = fmtFromTo Hex numFmt fmtHex
+-- fmtFromHexTo :: FormatType -> NumFormat -> NumFormat
+-- fmtFromHexTo numFmt fmtHex = fmtFromTo Hex numFmt fmtHex
 
-fmtFromHexToDec :: NumFormat -> NumFormat
-fmtFromHexToDec fmtHex = fmtFromHexTo Dec fmtHex
+-- fmtFromHexToDec :: NumFormat -> NumFormat
+-- fmtFromHexToDec fmtHex = fmtFromHexTo Dec fmtHex
 
-fmtFromHexToBin :: NumFormat -> NumFormat
-fmtFromHexToBin fmtHex = fmtFromHexTo Bin fmtHex
+-- fmtFromHexToBin :: NumFormat -> NumFormat
+-- fmtFromHexToBin fmtHex = fmtFromHexTo Bin fmtHex
 
--- simple case, limited to the case of conversion from hex
 composePrintFmts :: [FormatType] -> NumFormat -> [NumFormat]
 composePrintFmts (x:xs) fmt = fmtFromTo (format fmt) x fmt : composePrintFmts xs fmt
 composePrintFmts [] fmt = []
@@ -102,15 +101,26 @@ main = do
     let srcContent = content $ head $ formats
     let toPrintFormatsTypes = complementList srcFmt supportedFormatTypes
     -- putStrLn $ (show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
-    setSGR [SetColor Foreground Vivid Red]
-    setSGR [SetColor Background Vivid White]
+    setSGR [SetColor Foreground Vivid White]
+    setSGR [SetColor Background Vivid Blue]
+    putStr (show $ NumFormat srcFmt srcContent)
+    setSGR [SetColor Foreground Vivid White]
+    setSGR [SetColor Background Vivid Black]
     setSGR [SetConsoleIntensity BoldIntensity]
-    mapM_ putStrLn (map show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
+    mapM_ putStr (map show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
+    putStrLn ""
     setSGR [Reset]
 
+    {--
     putStrLn $ tableString [def , numCol]
                        unicodeRoundS
                        def
-                       [ rowG (map show (composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent)))
-                       , rowG ["Jane", "162.2"]
-                       ]
+                       [ rowG $ map show $ composePrintFmts toPrintFormatsTypes (NumFormat srcFmt srcContent) ]
+
+    putStrLn $ tableString [fixedLeftCol 10, column (fixed 10) center dotAlign def]
+                        unicodeS
+                        (titlesH ["Text", "Number"])
+                        [ rowG ["A very long text", "0.42000000"]
+                        , rowG ["Short text", "100200.5"]
+                        ]
+--}
