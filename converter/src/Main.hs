@@ -71,9 +71,12 @@ decTo :: FormatType -> (String -> String)
 decTo Bin = decToBin
 decTo Hex = decToHex
 
-fromTo :: FormatType -> FormatType -> (String -> String)
+undefTo _ = (\x -> "Conversion not implemented")
+
+fromTo :: FormatType -> FormatType -> String -> String
 fromTo Dec = decTo
 fromTo Hex = hexTo
+fromTo _ = undefTo
 
 fmtFromTo :: FormatType -> FormatType -> NumFormat -> NumFormat
 fmtFromTo fromType toType fromNumFmt =
