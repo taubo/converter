@@ -36,7 +36,7 @@ getNumFormat(x:xs)
   | otherwise           = NumFormat { format = Unrecognized, content = x:xs}
 
 supportedFormatTypes :: [FormatType]
-supportedFormatTypes = [Hex, Bin, Dec, Str]
+supportedFormatTypes = [Hex, Bin, Dec]
 
 complementList :: (Eq a) => a -> [a] -> [a]
 complementList elem ls = filter (elem /=) ls
