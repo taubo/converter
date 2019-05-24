@@ -36,7 +36,7 @@ getNumFormat(x:xs)
   | otherwise           = NumFormat { format = Unrecognized, content = x:xs}
 
 supportedFormatTypes :: [FormatType]
-supportedFormatTypes = [Hex, Bin, Dec]
+supportedFormatTypes = [Hex, Bin, Dec, Str]
 
 complementList :: (Eq a) => a -> [a] -> [a]
 complementList elem ls = filter (elem /=) ls
@@ -45,31 +45,18 @@ toBase :: (ReadS Int) -> Int -> String -> String
 toBase readFunc base num = showIntAtBase base intToDigit (fst . head . readFunc $ num) ""
 
 decToBase :: Int -> String -> String
-decToBase base dec = toBase readDec base dec
+decToBase = toBase readDec
 
 hexToBase :: Int -> String -> String
-hexToBase base hex = toBase readHex base hex
-
--- example of a conversion from hex to bin
-hexToBin :: String -> String
-hexToBin hex = hexToBase 2 hex
-
-hexToDec :: String -> String
-hexToDec hex = hexToBase 10 hex
+hexToBase = toBase readHex
 
 hexTo :: FormatType -> (String -> String)
-hexTo Bin = hexToBin
-hexTo Dec = hexToDec
-
-decToBin :: String -> String
-decToBin dec = decToBase 2 dec
-
-decToHex :: String -> String
-decToHex dec = decToBase 16 dec
+hexTo Bin = hexToBase 2
+hexTo Dec = hexToBase 10
 
 decTo :: FormatType -> (String -> String)
-decTo Bin = decToBin
-decTo Hex = decToHex
+decTo Bin = decToBase 2
+decTo Hex = decToBase 16
 
 undefTo _ = (\x -> "Conversion not implemented")
 
@@ -81,18 +68,6 @@ fromTo _ = undefTo
 fmtFromTo :: FormatType -> FormatType -> NumFormat -> NumFormat
 fmtFromTo fromType toType fromNumFmt =
     NumFormat { format = toType, content = (fromTo fromType toType) $ content $ fromNumFmt }
-
--- fmtFromDecTo :: FormatType -> NumFormat -> NumFormat
--- fmtFromDecTo numFmt fmtDec = fmtFromTo Dec numFmt fmtDec
-
--- fmtFromHexTo :: FormatType -> NumFormat -> NumFormat
--- fmtFromHexTo numFmt fmtHex = fmtFromTo Hex numFmt fmtHex
-
--- fmtFromHexToDec :: NumFormat -> NumFormat
--- fmtFromHexToDec fmtHex = fmtFromHexTo Dec fmtHex
-
--- fmtFromHexToBin :: NumFormat -> NumFormat
--- fmtFromHexToBin fmtHex = fmtFromHexTo Bin fmtHex
 
 composePrintFmts :: [FormatType] -> NumFormat -> [NumFormat]
 composePrintFmts (x:xs) fmt = fmtFromTo (format fmt) x fmt : composePrintFmts xs fmt
